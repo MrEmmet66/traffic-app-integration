@@ -31,7 +31,7 @@ API_BASE = "https://testgramserv.webaipay.ru"
 RESOURCE_CHECK_URL = f"{API_BASE}/resources/{RESOURCE_KEY}"
 TASK_URL_TEMPLATE = f"{API_BASE}/tasks/{{user_id}}"
 
-bot = Bot(token=ВАШ_ТОКЕН_БОТА, parse_mode=ParseMode.HTML)
+bot = Bot(token='ВАШ_ТОКЕН_БОТА')
 dp = Dispatcher()
 router = Router()
 
@@ -101,9 +101,9 @@ async def process_user_interaction(event: types.Message | types.CallbackQuery):
 
         if not not_subscribed:
             if isinstance(event, types.Message):
-                # СЮДА ВСТАВЬТЕ КОД СТАРТА ВАШЕГО БОТА
+                # ВАШ КОД СТАРТА БОТА
             elif isinstance(event, types.CallbackQuery):
-                # СЮДА ВСТАВЬТЕ КОД СТАРТА ВАШЕГО БОТА
+                # ВАШ КОД СТАРТА БОТА
             return
 
         # Пользователь не подписан на все каналы
@@ -115,20 +115,20 @@ async def process_user_interaction(event: types.Message | types.CallbackQuery):
             await event.message.answer(msg, reply_markup=keyboard)
         return
 
-    # Ошибка или нет ответа
-    fallback = "🔄 Что-то пошло не так. Попробуйте позже."
+    # Случай, когда task_data равен None (запрос не прошел)
+    maintenance_msg = "🛠 Ведутся технические работы. Пожалуйста, попробуйте позже."
     if isinstance(event, types.Message):
-        await event.answer(fallback)
+        await event.answer(maintenance_msg)
     elif isinstance(event, types.CallbackQuery):
-        await event.message.answer(fallback)
+        await event.message.answer(maintenance_msg)
 
 
 # ──────── Хендлеры ────────
-@router.message(CommandStart())
+@router.message(CommandStart(), lambda msg: msg.chat.type == "private")
 async def start_cmd(message: Message):
     await process_user_interaction(message)
 
-@router.message()
+@router.message(lambda msg: msg.chat.type == "private")
 async def handle_all_messages(message: Message):
     await process_user_interaction(message)
 
